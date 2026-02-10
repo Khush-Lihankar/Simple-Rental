@@ -1,1 +1,1595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Rental Listing</title>
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+            padding: 0;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header styles */
+        header {
+            background-color: #fff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2563eb;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .btn-link {
+            text-decoration: none;
+            color: #4b5563;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .btn-link:hover {
+            background-color: #f3f4f6;
+            color: #2563eb;
+        }
+
+        .user-email {
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+
+        /* Main content */
+        main {
+            min-height: calc(100vh - 140px);
+            padding: 2rem 0;
+        }
+
+        /* Page container */
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* Home page styles */
+        .hero {
+            text-align: center;
+            padding: 3rem 0;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+
+        /* Search and filter section */
+        .search-section {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #1d4ed8;
+        }
+
+        .filter-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            background-color: #f3f4f6;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background-color: #2563eb;
+            color: white;
+        }
+
+        /* Property cards grid */
+        .properties-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .property-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+
+        .property-card:hover {
+            transform: translateY(-5px);
+        }
+
+        /* Availability badge */
+        .availability-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            z-index: 10;
+        }
+
+        .availability-badge.available {
+            background-color: #10b981;
+            color: white;
+        }
+
+        .availability-badge.not-available {
+            background-color: #ef4444;
+            color: white;
+        }
+
+        .property-header {
+            padding: 1rem;
+            background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .property-type {
+            background: #2563eb;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .property-price {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #059669;
+        }
+
+        .property-details {
+            padding: 1rem;
+        }
+
+        .detail-row {
+            margin-bottom: 0.75rem;
+            display: flex;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #4b5563;
+            min-width: 100px;
+        }
+
+        .detail-value {
+            color: #6b7280;
+            flex: 1;
+        }
+
+        .property-map {
+            margin: 1rem;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .property-contact {
+            padding: 1rem;
+            background: #f8fafc;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .contact-label {
+            font-weight: 600;
+            color: #4b5563;
+            margin-right: 0.5rem;
+        }
+
+        .contact-phone {
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .contact-phone:hover {
+            text-decoration: underline;
+        }
+
+        /* Toggle switch styles */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: #10b981;
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+
+        .toggle-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            color: #4b5563;
+        }
+
+        .delete-btn {
+            padding: 0.5rem 1rem;
+            background-color: #dc2626;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .delete-btn:hover {
+            background-color: #b91c1c;
+        }
+
+        /* Form styles */
+        .form-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #4b5563;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+
+        textarea.form-control {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        select.form-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 2rem;
+        }
+
+        /* Auth pages */
+        .auth-container {
+            max-width: 400px;
+            margin: 3rem auto;
+        }
+
+        .auth-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+        }
+
+        .auth-card h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #2563eb;
+        }
+
+        .auth-links {
+            text-align: center;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .auth-links a {
+            color: #2563eb;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .auth-links a:hover {
+            text-decoration: underline;
+        }
+
+        /* Loading, error, and empty states */
+        .loading, .no-properties, .error {
+            text-align: center;
+            padding: 3rem;
+            background: white;
+            border-radius: 10px;
+            color: #6b7280;
+        }
+
+        .error {
+            color: #dc2626;
+        }
+
+        .no-properties a {
+            color: #2563eb;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .no-properties a:hover {
+            text-decoration: underline;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #1f2937;
+            color: white;
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .footer-links a {
+            color: #d1d5db;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }  /* Credits section */
+        .credits {
+            text-align: center;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #374151;
+            color: #9ca3af;
+            font-size: 0.9rem;
+        }
+
+        .credits span {
+            color: #60a5fa;
+            font-weight: 500;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .search-box {
+                flex-direction: column;
+            }
+            
+            .properties-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .property-contact {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 1.75rem;
+            }
+            
+            .form-container, .auth-card {
+                padding: 1.5rem;
+            }
+        }
+
+        /* Messages */
+        .message {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .message.success {
+            background-color: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .message.error {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        .message.info {
+            background-color: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #bfdbfe;
+        }
+
+        /* Map link button */
+        .map-link-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background-color: #3b82f6;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            transition: background-color 0.3s ease;
+            margin-top: 0.5rem;
+        }
+
+        .map-link-btn:hover {
+            background-color: #2563eb;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container header-content">
+            <a href="#" onclick="showPage('home')" class="logo">🏠 SimpleRental</a>
+            <nav class="nav-links" id="authLinks">
+                <!-- Dynamic auth links will be inserted here -->
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Home Page -->
+        <div id="home-page" class="page active">
+            <section class="hero">
+                <h1>Find Your Perfect Rental Property</h1>
+                <p>Browse rooms, shops, land, and houses for rent. Contact owners directly with no middleman.</p>
+                <button class="btn" onclick="showPage('upload')">List Your Property</button>
+            </section>
+
+            <section class="search-section">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Search by city, type, or keyword...">
+                    <button class="btn" onclick="searchProperties()">Search</button>
+                </div>
+                
+                <div class="filter-buttons">
+                    <button class="filter-btn active" onclick="filterByType('all')">All</button>
+                    <button class="filter-btn" onclick="filterByType('room')">Rooms</button>
+                    <button class="filter-btn" onclick="filterByType('shop')">Shops</button>
+                    <button class="filter-btn" onclick="filterByType('land')">Land</button>
+                    <button class="filter-btn" onclick="filterByType('house')">Houses</button>
+                    <button class="filter-btn" onclick="filterByAvailability('available')">Available</button>
+                </div>
+            </section>
+
+            <section id="propertiesContainer">
+                <!-- Properties will be loaded here dynamically -->
+                <div class="loading">Loading properties...</div>
+            </section>
+        </div>
+
+        <!-- Login Page -->
+        <div id="login-page" class="page">
+            <div class="auth-container">
+                <div class="auth-card">
+                    <h2>Login to Your Account</h2>
+                    <div id="loginMessage"></div>
+                    
+                    <form id="loginForm" onsubmit="loginUser(event)">
+                        <div class="form-group">
+                            <label for="loginEmail">Email Address</label>
+                            <input type="email" id="loginEmail" class="form-control" required placeholder="your@email.com">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="loginPassword">Password</label>
+                            <input type="password" id="loginPassword" class="form-control" required placeholder="Enter your password">
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="btn" id="loginBtn">Login</button>
+                            <button type="button" class="btn-link" onclick="showPage('home')">Cancel</button>
+                        </div>
+                    </form>
+                    
+                    <div class="auth-links">
+                        <p>Don't have an account? <a onclick="showPage('signup')">Sign up here</a></p>
+                        <p>View properties without login: <a onclick="showPage('home')">Browse Listings</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Signup Page -->
+        <div id="signup-page" class="page">
+            <div class="auth-container">
+                <div class="auth-card">
+                    <h2>Create Your Account</h2>
+                    <p style="text-align: center; margin-bottom: 1.5rem; color: #6b7280;">
+                        Sign up is only required to list properties. You can browse without an account.
+                    </p>
+                    <div id="signupMessage"></div>
+                    
+                    <form id="signupForm" onsubmit="signupUser(event)">
+                        <div class="form-group">
+                            <label for="signupEmail">Email Address</label>
+                            <input type="email" id="signupEmail" class="form-control" required placeholder="your@email.com">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="signupPassword">Password (min 6 characters)</label>
+                            <input type="password" id="signupPassword" class="form-control" required minlength="6" placeholder="Create a password">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="confirmPassword">Confirm Password</label>
+                            <input type="password" id="confirmPassword" class="form-control" required placeholder="Confirm your password">
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="btn" id="signupBtn">Create Account</button>
+                            <button type="button" class="btn-link" onclick="showPage('home')">Cancel</button>
+                        </div>
+                    </form>
+                    
+                    <div class="auth-links">
+                        <p>Already have an account? <a onclick="showPage('login')">Login here</a></p>
+                        <p>Continue without account: <a onclick="showPage('home')">Browse Listings</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upload Property Page -->
+        <div id="upload-page" class="page">
+            <div class="form-container">
+                <h1 style="margin-bottom: 2rem; color: #2563eb;">List Your Property for Rent</h1>
+                <p style="margin-bottom: 2rem; color: #6b7280;">
+                    Fill in the details below. Your contact information will be visible to potential renters.
+                </p>
+                <div id="uploadMessage"></div>
+                
+                <form id="uploadForm" onsubmit="uploadProperty(event)">
+                    <div class="form-group">
+                        <label for="propertyType">Property Type *</label>
+                        <select id="propertyType" class="form-control" required>
+                            <option value="">Select type</option>
+                            <option value="Room">Room</option>
+                            <option value="Shop">Shop</option>
+                            <option value="Land">Land</option>
+                            <option value="House">House</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="size">Property Size *</label>
+                        <input type="text" id="size" class="form-control" required 
+                               placeholder="e.g., 1000 sq ft, 2 BHK, 1 Acre">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="facilities">Facilities & Amenities</label>
+                        <textarea id="facilities" class="form-control" 
+                                  placeholder="e.g., Parking, Water Supply, Electricity, Furniture, etc."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="monthlyRent">Monthly Rent (Rs) *</label>
+                        <input type="number" id="monthlyRent" class="form-control" required 
+                               min="1" placeholder="e.g., 500">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="city">City / Area *</label>
+                        <input type="text" id="city" class="form-control" required 
+                               placeholder="e.g., New York, Manhattan">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="address">Full Address *</label>
+                        <textarea id="address" class="form-control" required 
+                                  placeholder="Enter complete address including street, building, etc."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="phone">Contact Phone Number *</label>
+                        <input type="tel" id="phone" class="form-control" required 
+                               placeholder="e.g., +1 (555) 123-4567">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="mapLink">Google Maps Location (Optional)</label>
+                        <input type="text" id="mapLink" class="form-control" 
+                               placeholder="e.g., https://maps.google.com/?q=New+York">
+                        <small style="color: #6b7280; display: block; margin-top: 0.5rem;">
+                            Tip: Go to Google Maps, find your location, copy the URL from address bar
+                        </small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="toggle-label">
+                            <span>Show on Rent (Available)</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="isAvailable" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <small style="color: #6b7280; display: block; margin-top: 0.5rem;">
+                            Toggle to show/hide your property from public listings
+                        </small>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn" id="submitBtn">List Property</button>
+                        <button type="button" class="btn-link" onclick="showPage('home')">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- My Listings Page -->
+        <div id="my-listings-page" class="page">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h1>My Listings</h1>
+                <span id="userEmail" style="color: #6b7280;"></span>
+            </div>
+            
+            <div style="background: #dbeafe; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+                <p style="margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="font-size: 1.2rem;">📋</span>
+                    <span>Here you can view and manage all properties you've listed.</span>
+                </p>
+            </div>
+            
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <button onclick="showPage('upload')" class="btn" style="font-size: 1.1rem; padding: 1rem 2rem;">
+                    + Add New Property
+                </button>
+            </div>
+            
+            <div id="userPropertiesContainer">
+                <!-- User's properties will be loaded here dynamically -->
+                <div class="loading">Loading your listings...</div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+ <footer>
+    <div class="container">
+        <div class="footer-content">
+            <p>&copy; 2024 SimpleRental. All rights reserved.</p>
+            <div class="footer-links">
+                <a onclick="showPage('upload')">List Property</a>
+                <a onclick="showPage('my-listings')">My Listings</a>
+                <a >Login</a>
+            </div>
+        </div>
+        <div class="credits">
+            Made By <span>  Varun & Khush 😎</span>
+        </div>
+    </div>
+</footer>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBgE_mQdU_gSEO-ZsudRcS7JBP3C6FAnRg",
+            authDomain: "simplerental-b9bcd.firebaseapp.com",
+            projectId: "simplerental-b9bcd",
+            storageBucket: "simplerental-b9bcd.firebasestorage.app",
+            messagingSenderId: "976049189211",
+            appId: "1:976049189211:web:5dc8ace74668072ccc6a7e",
+            measurementId: "G-964G6TVX6J"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Global variables
+        let currentUser = null;
+
+        // Page Navigation
+        function showPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // Show selected page
+            document.getElementById(`${pageId}-page`).classList.add('active');
+            
+            // Update navigation based on page
+            updateNavigation();
+            
+            // Load data if needed
+            if (pageId === 'home') {
+                loadAllProperties();
+            } else if (pageId === 'my-listings') {
+                loadUserProperties();
+            }
+            
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+
+        // Update Navigation
+        function updateNavigation() {
+            const authLinks = document.getElementById('authLinks');
+            const userEmail = document.getElementById('userEmail');
+            
+            if (authLinks) {
+                if (currentUser) {
+                    authLinks.innerHTML = `
+                        <span class="user-email">${currentUser.email}</span>
+                        <a onclick="showPage('my-listings')" class="btn-link">My Listings</a>
+                        <a onclick="logout()" class="btn-link">Logout</a>
+                    `;
+                } else {
+                    authLinks.innerHTML = `
+                        <a onclick="showPage('login')" class="btn-link">Login</a>
+                        <a onclick="showPage('signup')" class="btn-link">Sign Up</a>
+                    `;
+                }
+            }
+            
+            if (userEmail) {
+                userEmail.textContent = currentUser ? currentUser.email : '';
+            }
+        }
+
+        // Authentication Functions
+        auth.onAuthStateChanged((user) => {
+            currentUser = user;
+            updateNavigation();
+            
+            // Redirect if not logged in and trying to access protected pages
+            const currentPage = document.querySelector('.page.active').id;
+            if (!user && (currentPage === 'upload-page' || currentPage === 'my-listings-page')) {
+                showPage('login');
+            }
+            
+            // Redirect if logged in and trying to access auth pages
+            if (user && (currentPage === 'login-page' || currentPage === 'signup-page')) {
+                showPage('upload');
+            }
+        });
+
+        // Sign Up Function
+        async function signupUser(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const signupBtn = document.getElementById('signupBtn');
+            const messageDiv = document.getElementById('signupMessage');
+            
+            // Clear previous messages
+            messageDiv.innerHTML = '';
+            
+            // Basic validation
+            if (!email || !password || !confirmPassword) {
+                showMessage('signupMessage', 'Please fill in all fields', 'error');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                showMessage('signupMessage', 'Passwords do not match', 'error');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showMessage('signupMessage', 'Password must be at least 6 characters long', 'error');
+                return;
+            }
+            
+            // Show loading
+            const originalText = signupBtn.textContent;
+            signupBtn.textContent = 'Creating account...';
+            signupBtn.disabled = true;
+            
+            try {
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                showMessage('signupMessage', 'Account created successfully!', 'success');
+                
+                // Redirect after delay
+                setTimeout(() => {
+                    document.getElementById('signupForm').reset();
+                    showPage('upload');
+                }, 1500);
+            } catch (error) {
+                console.error("Signup error:", error);
+                showMessage('signupMessage', `Error: ${error.message}`, 'error');
+            } finally {
+                signupBtn.textContent = originalText;
+                signupBtn.disabled = false;
+            }
+        }
+
+        // Login Function
+        async function loginUser(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const loginBtn = document.getElementById('loginBtn');
+            const messageDiv = document.getElementById('loginMessage');
+            
+            // Clear previous messages
+            messageDiv.innerHTML = '';
+            
+            // Basic validation
+            if (!email || !password) {
+                showMessage('loginMessage', 'Please fill in all fields', 'error');
+                return;
+            }
+            
+            // Show loading
+            const originalText = loginBtn.textContent;
+            loginBtn.textContent = 'Logging in...';
+            loginBtn.disabled = true;
+            
+            try {
+                const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                showMessage('loginMessage', 'Logged in successfully!', 'success');
+                
+                // Redirect after delay
+                setTimeout(() => {
+                    document.getElementById('loginForm').reset();
+                    showPage('upload');
+                }, 1500);
+            } catch (error) {
+                console.error("Login error:", error);
+                showMessage('loginMessage', `Error: ${error.message}`, 'error');
+            } finally {
+                loginBtn.textContent = originalText;
+                loginBtn.disabled = false;
+            }
+        }
+
+        // Logout Function
+        async function logout() {
+            try {
+                await auth.signOut();
+                showPage('home');
+                showMessage('home', 'Logged out successfully!', 'success');
+            } catch (error) {
+                console.error("Logout error:", error);
+                showMessage('home', `Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Property Upload Function
+        async function uploadProperty(event) {
+            event.preventDefault();
+            
+            if (!currentUser) {
+                showMessage('uploadMessage', 'Please login to upload properties', 'error');
+                showPage('login');
+                return;
+            }
+            
+            // Get form values
+            const propertyData = {
+                ownerId: currentUser.uid,
+                ownerEmail: currentUser.email,
+                propertyType: document.getElementById('propertyType').value,
+                size: document.getElementById('size').value,
+                facilities: document.getElementById('facilities').value,
+                monthlyRent: document.getElementById('monthlyRent').value,
+                city: document.getElementById('city').value,
+                address: document.getElementById('address').value,
+                phone: document.getElementById('phone').value,
+                mapLink: document.getElementById('mapLink').value,
+                isAvailable: document.getElementById('isAvailable').checked,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                ownerId_createdAt: `${currentUser.uid}_${Date.now()}`
+            };
+            
+            // Validate form
+            if (!validatePropertyForm(propertyData)) {
+                return;
+            }
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const messageDiv = document.getElementById('uploadMessage');
+            
+            // Show loading
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Uploading...';
+            submitBtn.disabled = true;
+            
+            // Clear previous messages
+            messageDiv.innerHTML = '';
+            
+            try {
+                // Save to Firestore
+                await db.collection('properties').add(propertyData);
+                
+                showMessage('uploadMessage', 'Property listed successfully!', 'success');
+                
+                // Reset form and redirect
+                setTimeout(() => {
+                    document.getElementById('uploadForm').reset();
+                    document.getElementById('isAvailable').checked = true; // Reset toggle
+                    showPage('my-listings');
+                }, 1500);
+            } catch (error) {
+                console.error('Error uploading property:', error);
+                showMessage('uploadMessage', `Error: ${error.message}`, 'error');
+            } finally {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            }
+        }
+
+        // Form Validation
+        function validatePropertyForm(data) {
+            const messageDiv = document.getElementById('uploadMessage');
+            messageDiv.innerHTML = '';
+            
+            if (!data.propertyType) {
+                showMessage('uploadMessage', 'Please select property type', 'error');
+                return false;
+            }
+            if (!data.size) {
+                showMessage('uploadMessage', 'Please enter property size', 'error');
+                return false;
+            }
+            if (!data.monthlyRent) {
+                showMessage('uploadMessage', 'Please enter monthly rent', 'error');
+                return false;
+            }
+            if (!data.city) {
+                showMessage('uploadMessage', 'Please enter city', 'error');
+                return false;
+            }
+            if (!data.address) {
+                showMessage('uploadMessage', 'Please enter full address', 'error');
+                return false;
+            }
+            if (!data.phone) {
+                showMessage('uploadMessage', 'Please enter phone number', 'error');
+                return false;
+            }
+            
+            // Validate phone number (basic validation)
+            const phoneRegex = /^[0-9\s\-\+\(\)]{10,}$/;
+            if (!phoneRegex.test(data.phone.replace(/\D/g, ''))) {
+                showMessage('uploadMessage', 'Please enter a valid phone number', 'error');
+                return false;
+            }
+            
+            return true;
+        }
+
+        // Load All Properties - Show only available properties
+        async function loadAllProperties() {
+            const propertiesContainer = document.getElementById('propertiesContainer');
+            if (!propertiesContainer) return;
+            
+            try {
+                // Show loading
+                propertiesContainer.innerHTML = '<div class="loading">Loading properties...</div>';
+                
+                // Get all properties ordered by creation date (newest first)
+                const snapshot = await db.collection('properties')
+                    .orderBy('createdAt', 'desc')
+                    .get();
+                
+                if (snapshot.empty) {
+                    propertiesContainer.innerHTML = '<div class="no-properties">No properties listed yet. Be the first to list one!</div>';
+                    return;
+                }
+                
+                // Clear container
+                propertiesContainer.innerHTML = '';
+                
+                let hasAvailableProperties = false;
+                
+                // Create property cards - only show available properties
+                snapshot.forEach(doc => {
+                    const property = doc.data();
+                    const propertyId = doc.id;
+                    
+                    // Only show available properties on home page
+                    if (property.isAvailable !== false) {
+                        const propertyCard = createPropertyCard(property, propertyId, false);
+                        propertiesContainer.appendChild(propertyCard);
+                        hasAvailableProperties = true;
+                    }
+                });
+                
+                if (!hasAvailableProperties) {
+                    propertiesContainer.innerHTML = '<div class="no-properties">No available properties at the moment. Check back later!</div>';
+                    return;
+                }
+            } catch (error) {
+                console.error('Error loading properties:', error);
+                propertiesContainer.innerHTML = '<div class="error">Error loading properties. Please refresh the page.</div>';
+            }
+        }
+
+        // Load User's Properties - Show all user's properties regardless of availability
+        async function loadUserProperties() {
+            const userPropertiesContainer = document.getElementById('userPropertiesContainer');
+            if (!userPropertiesContainer) return;
+            
+            if (!currentUser) {
+                showPage('login');
+                return;
+            }
+            
+            try {
+                // Show loading
+                userPropertiesContainer.innerHTML = '<div class="loading">Loading your listings...</div>';
+                
+                // Get all properties and filter client-side
+                const snapshot = await db.collection('properties').get();
+                
+                if (snapshot.empty) {
+                    userPropertiesContainer.innerHTML = '<div class="no-properties">You haven\'t listed any properties yet. <a onclick="showPage(\'upload\')">List your first property</a></div>';
+                    return;
+                }
+                
+                // Clear container
+                userPropertiesContainer.innerHTML = '';
+                
+                // Filter properties by ownerId client-side
+                const userProperties = [];
+                snapshot.forEach(doc => {
+                    const property = doc.data();
+                    if (property.ownerId === currentUser.uid) {
+                        userProperties.push({
+                            id: doc.id,
+                            ...property
+                        });
+                    }
+                });
+                
+                // Sort by createdAt manually (newest first)
+                userProperties.sort((a, b) => {
+                    if (a.createdAt && b.createdAt) {
+                        return b.createdAt.toDate() - a.createdAt.toDate();
+                    }
+                    return 0;
+                });
+                
+                if (userProperties.length === 0) {
+                    userPropertiesContainer.innerHTML = '<div class="no-properties">You haven\'t listed any properties yet. <a onclick="showPage(\'upload\')">List your first property</a></div>';
+                    return;
+                }
+                
+                // Create property cards
+                userProperties.forEach(property => {
+                    const propertyCard = createPropertyCard(property, property.id, true);
+                    userPropertiesContainer.appendChild(propertyCard);
+                });
+            } catch (error) {
+                console.error('Error loading user properties:', error);
+                userPropertiesContainer.innerHTML = '<div class="error">Error loading your listings. Please try again.</div>';
+            }
+        }
+
+        // Create Property Card
+        function createPropertyCard(property, propertyId, isOwnerView = false) {
+            const card = document.createElement('div');
+            card.className = 'property-card';
+            card.dataset.id = propertyId;
+            
+            // Format map link - use simple Google Maps URL
+            let mapLink = '';
+            if (property.mapLink) {
+                // Clean up the map link
+                if (property.mapLink.includes('google.com/maps')) {
+                    mapLink = property.mapLink;
+                } else if (property.mapLink.includes('maps.app.goo.gl')) {
+                    // Handle Google Maps short URLs
+                    mapLink = property.mapLink;
+                } else {
+                    // Create a simple Google Maps search URL
+                    const searchQuery = encodeURIComponent(`${property.address}, ${property.city}`);
+                    mapLink = `https://www.google.com/maps/search/?api=1&query=${searchQuery}`;
+                }
+            } else {
+                // Create default Google Maps search URL
+                const searchQuery = encodeURIComponent(`${property.address}, ${property.city}`);
+                mapLink = `https://www.google.com/maps/search/?api=1&query=${searchQuery}`;
+            }
+            
+            // Format date
+            let formattedDate = '';
+            if (property.createdAt) {
+                try {
+                    const date = property.createdAt.toDate ? property.createdAt.toDate() : new Date(property.createdAt);
+                    formattedDate = date.toLocaleDateString();
+                } catch (e) {
+                    formattedDate = 'Recent';
+                }
+            }
+            
+            // Determine availability status
+            const isAvailable = property.isAvailable !== false; // Default to true if not set
+            const availabilityClass = isAvailable ? 'available' : 'not-available';
+            const availabilityText = isAvailable ? 'Available' : 'Not Available';
+            
+            card.innerHTML = `
+                ${!isAvailable ? '<div class="availability-badge not-available">Not Available</div>' : ''}
+                
+                <div class="property-header">
+                    <span class="property-type">${property.propertyType}</span>
+                    <span class="property-price">Rs${property.monthlyRent}/month</span>
+                </div>
+                
+                <div class="property-details">
+                    <div class="detail-row">
+                        <span class="detail-label">Size:</span>
+                        <span class="detail-value">${property.size}</span>
+                    </div>
+                    
+                    <div class="detail-row">
+                        <span class="detail-label">Facilities:</span>
+                        <span class="detail-value">${property.facilities || 'Not specified'}</span>
+                    </div>
+                    
+                    <div class="detail-row">
+                        <span class="detail-label">Location:</span>
+                        <span class="detail-value">${property.city} - ${property.address}</span>
+                    </div>
+                    
+                    <div class="detail-row">
+                        <span class="detail-label">Listed:</span>
+                        <span class="detail-value">${formattedDate}</span>
+                    </div>
+                    
+                    <div class="detail-row">
+                        <span class="detail-label">Status:</span>
+                        <span class="detail-value ${availabilityClass}">${availabilityText}</span>
+                    </div>
+                    
+                    ${isOwnerView ? `
+                        <div class="detail-row">
+                            <span class="detail-label">Listed by:</span>
+                            <span class="detail-value">You (${property.ownerEmail})</span>
+                        </div>
+                    ` : ''}
+                </div>
+                
+                <div style="margin: 0 1rem;">
+                    <a href="${mapLink}" target="_blank" class="map-link-btn">
+                        <span>🗺️ View on Google Maps</span>
+                    </a>
+                </div>
+                
+                <div class="property-contact">
+                    <div class="contact-info">
+                        <span class="contact-label">Contact Owner:</span>
+                        <a href="tel:${property.phone}" class="contact-phone">
+                            📞 ${property.phone}
+                        </a>
+                    </div>
+                    ${isOwnerView ? `
+                        <div style="display: flex; gap: 1rem; align-items: center;">
+                            <div class="toggle-label">
+                                <span>Available:</span>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" ${isAvailable ? 'checked' : ''} 
+                                           onchange="toggleAvailability('${propertyId}', this.checked)">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <button onclick="deleteProperty('${propertyId}')" class="delete-btn">
+                                Delete
+                            </button>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            return card;
+        }
+
+        // Toggle Property Availability
+        async function toggleAvailability(propertyId, isAvailable) {
+            try {
+                await db.collection('properties').doc(propertyId).update({
+                    isAvailable: isAvailable,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                showMessage('my-listings', `Property marked as ${isAvailable ? 'Available' : 'Not Available'}`, 'success');
+                
+                // If on home page, refresh the properties list
+                if (document.getElementById('home-page').classList.contains('active')) {
+                    loadAllProperties();
+                }
+            } catch (error) {
+                console.error('Error toggling availability:', error);
+                showMessage('my-listings', `Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Delete Property
+        async function deleteProperty(propertyId) {
+            if (!confirm('Are you sure you want to delete this listing?')) {
+                return;
+            }
+            
+            try {
+                await db.collection('properties').doc(propertyId).delete();
+                
+                // Remove card from DOM
+                const card = document.querySelector(`[data-id="${propertyId}"]`);
+                if (card) {
+                    card.remove();
+                }
+                
+                // Check if any properties left
+                const container = document.getElementById('userPropertiesContainer');
+                if (container && container.children.length === 0) {
+                    container.innerHTML = '<div class="no-properties">You haven\'t listed any properties yet. <a onclick="showPage(\'upload\')">List your first property</a></div>';
+                }
+                
+                showMessage('my-listings', 'Listing deleted successfully!', 'success');
+                
+                // Refresh home page if needed
+                if (document.getElementById('home-page').classList.contains('active')) {
+                    loadAllProperties();
+                }
+            } catch (error) {
+                console.error('Error deleting property:', error);
+                showMessage('my-listings', `Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Search Properties
+        function searchProperties() {
+            const searchInput = document.getElementById('searchInput');
+            const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+            const propertyCards = document.querySelectorAll('.property-card');
+            
+            let found = false;
+            propertyCards.forEach(card => {
+                const text = card.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    card.style.display = 'block';
+                    found = true;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            if (!found && searchTerm) {
+                const container = document.getElementById('propertiesContainer');
+                if (container) {
+                    const noResults = document.createElement('div');
+                    noResults.className = 'no-properties';
+                    noResults.textContent = 'No properties found matching your search.';
+                    container.appendChild(noResults);
+                }
+            }
+        }
+
+        // Filter by Property Type
+        function filterByType(type) {
+            const propertyCards = document.querySelectorAll('.property-card');
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            
+            // Update active button
+            filterButtons.forEach(btn => {
+                if (type === 'all' && btn.textContent === 'All') {
+                    btn.classList.add('active');
+                } else if (btn.textContent.toLowerCase().includes(type)) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            let found = false;
+            propertyCards.forEach(card => {
+                const propertyType = card.querySelector('.property-type').textContent.toLowerCase();
+                
+                if (type === 'all' || propertyType.includes(type.toLowerCase())) {
+                    card.style.display = 'block';
+                    found = true;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            if (!found && type !== 'all') {
+                const container = document.getElementById('propertiesContainer');
+                if (container) {
+                    const noResults = document.createElement('div');
+                    noResults.className = 'no-properties';
+                    noResults.textContent = `No ${type} properties found.`;
+                    container.appendChild(noResults);
+                }
+            }
+        }
+
+        // Filter by Availability
+        function filterByAvailability(status) {
+            const propertyCards = document.querySelectorAll('.property-card');
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            
+            // Update active button
+            filterButtons.forEach(btn => {
+                if (btn.textContent.toLowerCase().includes(status)) {
+                    btn.classList.add('active');
+                } else if (btn.textContent === 'Available' && status !== 'available') {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            let found = false;
+            propertyCards.forEach(card => {
+                const statusText = card.querySelector('.detail-value').textContent.toLowerCase();
+                
+                if (status === 'available') {
+                    if (statusText.includes('available') && !statusText.includes('not available')) {
+                        card.style.display = 'block';
+                        found = true;
+                    } else {
+                        card.style.display = 'none';
+                    }
+                }
+            });
+            
+            if (!found && status === 'available') {
+                const container = document.getElementById('propertiesContainer');
+                if (container) {
+                    const noResults = document.createElement('div');
+                    noResults.className = 'no-properties';
+                    noResults.textContent = 'No available properties found.';
+                    container.appendChild(noResults);
+                }
+            }
+        }
+
+        // Show Message Function
+        function showMessage(location, text, type) {
+            let messageDiv;
+            
+            if (location === 'home') {
+                // Create a temporary message at the top of home page
+                const homePage = document.getElementById('home-page');
+                messageDiv = document.createElement('div');
+                messageDiv.className = `message ${type}`;
+                messageDiv.textContent = text;
+                messageDiv.style.marginTop = '1rem';
+                homePage.insertBefore(messageDiv, homePage.firstChild);
+                
+                // Remove after 5 seconds
+                setTimeout(() => {
+                    if (messageDiv.parentNode) {
+                        messageDiv.parentNode.removeChild(messageDiv);
+                    }
+                }, 5000);
+            } else if (location === 'my-listings') {
+                // Create a temporary message at the top of my-listings page
+                const myListingsPage = document.getElementById('my-listings-page');
+                messageDiv = document.createElement('div');
+                messageDiv.className = `message ${type}`;
+                messageDiv.textContent = text;
+                myListingsPage.insertBefore(messageDiv, myListingsPage.firstChild);
+                
+                // Remove after 5 seconds
+                setTimeout(() => {
+                    if (messageDiv.parentNode) {
+                        messageDiv.parentNode.removeChild(messageDiv);
+                    }
+                }, 5000);
+            } else {
+                messageDiv = document.getElementById(location);
+                if (messageDiv) {
+                    messageDiv.innerHTML = `<div class="message ${type}">${text}</div>`;
+                }
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load properties on home page
+            loadAllProperties();
+            
+            // Check authentication state
+            auth.onAuthStateChanged((user) => {
+                currentUser = user;
+                updateNavigation();
+            });
+        });
+    </script>
+</body>
+</html>
